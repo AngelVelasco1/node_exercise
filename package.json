@@ -1,0 +1,18 @@
+{
+  "name": "node-database",
+  "version": "0.0.1",
+  "description": "Main configuration file, using nodemon, dotenv, mysql2, express",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon --quiet app.js"
+  },
+  "author": "Angel Velasco",
+  "license": "ISC",
+  "devDependencies": {
+    "dotenv": "16.3.1",
+    "express": "4.18.2",
+    "mysql": "2.18.1",
+    "nodemon": "2.0.22"
+  }
+}
