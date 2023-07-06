@@ -1,13 +1,13 @@
 //? Dependencies
 import dotenv from 'dotenv';
 import mysql from "mysql2";
-import {Router} from 'express';
-dotenv.config("../");
+
+import { Router } from 'express';
 const storageBodegas = Router();
+dotenv.config("../");
 
-let conx;
-const myConfig = JSON.parse(process.env.MY_CONNECT);
-
+let conx = undefined;
+const myConfig = process.env.MY_CONNECT;
 storageBodegas.use((req, res, next) => {
     conx = mysql.createPool(myConfig);
     next();
@@ -31,22 +31,25 @@ storageBodegas.get('/', (req, res) => {
 
 //? Create bodegas
 storageBodegas.post('/', (req, res) => {
-    const newBodega = {
-        nombre: req.body.nombre,
-        id_responsable: req.body.id_responsable,
-        estado: req.body.estado,
-        created_by: req.body.created_by,
-        update_by: req.body.update_by,
-        created_at: req.body.created_at,
-        updated_at: req.body.updated_at,
-        deleted_at: req.body.deleted_at
-    };
-
+    const { nombre, id_responsable, estado, created_by, update_by, deleted_at } = req.body;
+    const created_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const updated_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const newBodega = [
+        nombre,
+        id_responsable,
+        estado,
+        created_by,
+        update_by,
+        created_at,
+        updated_at,
+        deleted_at
+    ];
+    const sqlPost = 'INSERT INTO bodegas (id, nombre, id_responsable, estado, created_by, update_by, created_at, updated_at, deleted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
     conx.query(
-        'INSERT INTO bodegas SET ?', newBodega, (err, fil, data) => {
+        sqlPost, newBodega, (err) => {
             if (err) {
                 console.error("Error en la consulta: ", err);
-    
+
             } else {
                 res.json(JSON.stringify(newBodega));
             }

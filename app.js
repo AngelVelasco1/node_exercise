@@ -9,8 +9,8 @@ import storageProductos from './routes/productos.js'
 dotenv.config();
 
 const appExpress = express();
-// appExpress.use(express.json());
-
+/* appExpress.use(express.json());
+ */
 appExpress.use("/bodegas", storageBodegas);
 appExpress.use("/productos", storageProductos);
 
