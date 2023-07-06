@@ -1,7 +1,7 @@
 //? Dependencies
 import mysql from 'mysql';
 
-import { router } from 'express';
+import {Router} from 'express';
 
 const storageBodegas = Router();
 let conx;
