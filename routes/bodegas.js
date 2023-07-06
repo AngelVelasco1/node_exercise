@@ -1,7 +1,7 @@
 //? Dependencies
 import mysql from 'mysql';
 
-import {router} from 'express';
+import { router } from 'express';
 
 const storageBodegas = Router();
 let conx;
@@ -21,6 +21,26 @@ storageBodegas.get('/', (req, res) => {
     )
 });
 
+//? Create bodegas
+storageBodegas.post('/', (req, res) => {
+    const { id, nombre, id_responsable, estado, created_by, update_by, created_at, updated_at, deleted_at } = req.body;
+    const newBodega = {
+        id,
+        nombre,
+        id_responsable,
+        estado,
+        created_by,
+        update_by,
+        created_at: new Date().toISOString(),
+        updated_at,
+        deleted_at
+    }
 
+    conx.query(
+        'INSERT INTO bodegas SET ?', newBodega, (err, fil) => {
+            res.json(JSON.stringify(newBodega));
+        }
+    )
+})
 
 export default storageBodegas;
