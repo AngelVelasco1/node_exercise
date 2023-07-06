@@ -1,0 +1,2 @@
+MY_CONFIG = {"hostname": "127.10.10.10", "port": 5050}
+MY_CONNECT = {"host": "localhost", "user": "campus", "database": "inventory", "password": "campus2023", "port": 3306}

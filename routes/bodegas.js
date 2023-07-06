@@ -1,12 +1,14 @@
 //? Dependencies
-import mysql from 'mysql';
-
+import dotenv from 'dotenv';
+import mysql from "mysql2";
 import {Router} from 'express';
-
+dotenv.config("../");
 const storageBodegas = Router();
+
 let conx;
+const myConfig = JSON.parse(process.env.MY_CONNECT);
+
 storageBodegas.use((req, res, next) => {
-    let myConfig = JSON.parse(process.env.MY_CONNECT);
     conx = mysql.createPool(myConfig);
     next();
 })
@@ -16,31 +18,40 @@ storageBodegas.get('/', (req, res) => {
     conx.query(
         'SELECT * FROM bodegas ORDER BY nombre ASC',
         (err, result, fil) => {
-            res.json(JSON.stringify(result));
+            if (err) {
+                console.error('Error :', err.message);
+                res.sendStatus(500);
+            } else {
+                res.send(JSON.stringify(result));
+            }
         }
-    )
+
+    );
 });
 
 //? Create bodegas
 storageBodegas.post('/', (req, res) => {
-    const { id, nombre, id_responsable, estado, created_by, update_by, created_at, updated_at, deleted_at } = req.body;
     const newBodega = {
-        id,
-        nombre,
-        id_responsable,
-        estado,
-        created_by,
-        update_by,
-        created_at: new Date().toISOString(),
-        updated_at,
-        deleted_at
-    }
+        nombre: req.body.nombre,
+        id_responsable: req.body.id_responsable,
+        estado: req.body.estado,
+        created_by: req.body.created_by,
+        update_by: req.body.update_by,
+        created_at: req.body.created_at,
+        updated_at: req.body.updated_at,
+        deleted_at: req.body.deleted_at
+    };
 
     conx.query(
-        'INSERT INTO bodegas SET ?', newBodega, (err, fil) => {
-            res.json(JSON.stringify(newBodega));
+        'INSERT INTO bodegas SET ?', newBodega, (err, fil, data) => {
+            if (err) {
+                console.error("Error en la consulta: ", err);
+    
+            } else {
+                res.json(JSON.stringify(newBodega));
+            }
         }
-    )
-})
+    );
+});
 
 export default storageBodegas;

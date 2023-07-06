@@ -1,7 +1,10 @@
 //? Dependencies
-import mysql from 'mysql';
+import mysql from 'mysql2';
 
-import {Router } from 'express';
+import {Router} from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config("../");
 
 const storageProductos = Router();
 
@@ -14,15 +17,20 @@ storageProductos.use((req, res, next) => {
 })
 
 //? List productos total descendent
-storageProductos.get('/', (req, res) => {
+storageProductos.get('/', (req, res, next) => {
     conx.query(
         'SELECT id FROM productos ORDER BY total DESC',
         (err, result, fil) => {
-            res.json(JSON.stringify(result));
+            res.json(result);
         }
     )
+    next();
 });
 
+//? Insert products with default amount
+storageProductos.post('/', (req, res) => {
+    'INSERT into productos (id) VALUES ('
+})
 
 
 export default storageProductos;
