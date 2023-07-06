@@ -17,10 +17,16 @@ storageProductos.use((req, res, next) => {
 
 //? List productos total descendent
 storageProductos.get('/', (req, res, next) => {
+    const sqlGet = 'SELECT * FROM productos, SUM(inventarios.cantidad) AS total FROM productos, INNER JOIN inventarios ON productos.id  = inventarios.id_producto GROUP BY productos.id ORDER BY total DESC'
     conx.query(
-        'SELECT id FROM productos ORDER BY total DESC',
-        (err, result, fil) => {
-            res.json(result);
+        sqlGet,
+        (err, result) => {
+            if (err) {
+                console.error("Error en la consulta: ", err);
+
+            } else {
+                res.json(JSON.stringify(result));
+            }
         }
     )
     next();
