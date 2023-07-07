@@ -32,10 +32,5 @@ storageProductos.get('/', (req, res, next) => {
     next();
 });
 
-//? Insert products with default amount
-storageProductos.post('/', (req, res) => {
-    'INSERT into productos (id) VALUES ('
-})
-
 
 export default storageProductos;
