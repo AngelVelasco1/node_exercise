@@ -30,8 +30,9 @@ storageBodegas.get('/', (req, res) => {
             if (err) {
                 console.error('Error de conexion:', err.message);
                 res.status(500);
+            } else {
+                res.send(JSON.stringify(result));
             }
-            res.send(JSON.stringify(result));
         });
 }); 
 

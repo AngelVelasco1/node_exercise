@@ -1,26 +1,40 @@
 //? Dependencies
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
-
 import {Router} from 'express';
+//? Enviroment variables
 dotenv.config("../");
 
 const storageProductos = Router();
 
+//? Variables
 let conx;
+const myConfig = JSON.parse(process.env.MY_CONNECT);
 
+//? Use database
 storageProductos.use((req, res, next) => {
-    let myConfig = JSON.parse(process.env.MY_CONNECT);
-    conx = mysql.createPool(myConfig);
-    next();
+    try {
+        conx = mysql.createPool(myConfig);
+        next();
+    } catch (err) {
+        console.error('Error de conexion:', err.message);
+        res.status(500);
+    }
 })
 
 //? List productos total descendent
-storageProductos.get('/', (req, res, next) => {
-    const sqlGet = 'SELECT * FROM productos, SUM(inventarios.cantidad) AS total FROM productos, INNER JOIN inventarios ON productos.id  = inventarios.id_producto GROUP BY productos.id ORDER BY total DESC'
+storageProductos.get('/', (req, res) => {
+    const action =  `
+      SELECT p.*, IFNULL ((
+          SELECT SUM(i.cantidad)
+          FROM inventarios i
+          WHERE i.id_producto = p.id
+        ), 0)  AS total
+        FROM productos p    
+        ORDER by total DESC
+    `
     conx.query(
-        sqlGet,
-        (err, result) => {
+        action, (err, result) => {
             if (err) {
                 console.error("Error en la consulta: ", err);
 
@@ -29,8 +43,6 @@ storageProductos.get('/', (req, res, next) => {
             }
         }
     )
-    next();
 });
-
 
 export default storageProductos;
