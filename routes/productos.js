@@ -1,7 +1,7 @@
 //? Dependencies
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
-import {Router} from 'express';
+import { Router } from 'express';
 //? Enviroment variables
 dotenv.config("../");
 
@@ -24,7 +24,7 @@ storageProductos.use((req, res, next) => {
 
 //? List productos total descendent
 storageProductos.get('/', (req, res) => {
-    const action =  `
+    const action = `
       SELECT p.*, IFNULL ((
           SELECT SUM(i.cantidad)
           FROM inventarios i
@@ -44,5 +44,30 @@ storageProductos.get('/', (req, res) => {
         }
     )
 });
+
+//? Insert products into inventories
+storageProductos.post('/', (req, res) => {
+    const productAction = 'INSERT INTO productos (nombre, descripcion, estado, created_by, update_by) VALUES ("Default name", "Default description", 1, NOW(), NOW())';
+    const inventoryAction = 'INSERT INTO inventarios (id_bodega, id_producto, cantidad, created_by, update_by, created_at, updated_at) VALUES (1, 1, 1, NOW(), NOW(), NOW(), NOW())';
+    const { nombre, descripcion, estado, created_by, update_by, initial_amount } = req.body;
+    const bodegaDefaultId = 1;
+
+    conx.query(
+        productAction, [nombre, descripcion, estado, created_by, update_by], ((err, result) => {
+            if (err) {
+                console.error("Error al insertar producto: ", err);
+                res.status(500);
+            } else {
+                const id_producto = result.insertId;
+                conx.query(
+                    inventoryAction, [bodegaDefaultId, id_producto, initial_amount, created_by, update_by], ((err, result) => {
+                        (err) ? console.error("Error al insertar producto: ", err) : res.json({ mensaje: "Producto insertado exitosamente" });;
+                    })
+                )
+            }
+        })
+    )
+
+})
 
 export default storageProductos;

@@ -2,120 +2,87 @@
 
 -- MySQL dump 10.13  Distrib 8.0.33, for Linux (x86_64)
 
---
-
 -- Host: localhost    Database: inventory
-
--- ------------------------------------------------------
-
--- Server version	8.0.33-0ubuntu0.22.04.2
-
 CREATE DATABASE inventory;
-
 USE inventory;
 
-/* bodegas table */
+/* bodegas */
+CREATE TABLE `bodegas` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `nombre` varchar(255) DEFAULT NULL,
+    `id_responsable` bigint DEFAULT NULL,
+    `estado` tinyint DEFAULT NULL,
+    `created_by` bigint DEFAULT NULL,
+    `updated_by` bigint DEFAULT NULL,
+    `created_at` timestamp NULL DEFAULT NULL,
+    `updated_at` timestamp NULL DEFAULT NULL,
+    `deleted_at` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_bodegas_id_responsable` FOREIGN KEY (`id_responsable`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE
-    `bodegas` (
-        `id` bigint NOT NULL AUTO_INCREMENT,
-        `nombre` varchar(255) DEFAULT NULL,
-        `id_responsable` bigint DEFAULT NULL,
-        `estado` tinyint DEFAULT NULL,
-        `created_by` bigint DEFAULT NULL,
-        `updated_by` bigint DEFAULT NULL,
-        `created_at` timestamp NULL DEFAULT NULL,
-        `updated_at` timestamp NULL DEFAULT NULL,
-        `deleted_at` timestamp NULL DEFAULT NULL,
-        PRIMARY KEY (`id`)
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+/* historiales */
+CREATE TABLE `historiales` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `cantidad` int NOT NULL,
+    `id_bodega_origen` bigint DEFAULT NULL,
+    `id_bodega_destino` bigint DEFAULT NULL,
+    `id_inventario` bigint DEFAULT NULL,
+    `created_by` bigint DEFAULT NULL,
+    `update_by` bigint DEFAULT NULL,
+    `created_at` timestamp NULL DEFAULT NULL,
+    `updated_at` timestamp NULL DEFAULT NULL,
+    `deleted_at` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_historiales_id_inventario` FOREIGN KEY (`id_inventario`) REFERENCES `inventarios` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-LOCK TABLES `bodegas` WRITE;
+/* inventarios */
+CREATE TABLE `inventarios` (
+    `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+    `id_bodega` bigint unsigned NOT NULL,
+    `id_producto` bigint unsigned NOT NULL,
+    `cantidad` int NOT NULL,
+    `created_by` bigint unsigned DEFAULT NULL,
+    `update_by` bigint unsigned DEFAULT NULL,
+    `created_at` timestamp NULL DEFAULT NULL,
+    `updated_at` timestamp NULL DEFAULT NULL,
+    `deleted_at` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `fk_inventarios_created_by` (`created_by`),
+    KEY `fk_inventarios_updated_by` (`update_by`),
+    CONSTRAINT `fk_inventarios_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+    CONSTRAINT `fk_inventarios_updated_by` FOREIGN KEY (`update_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+ALTER TABLE `inventarios`
+    DROP INDEX `id_bodega`,
+    DROP INDEX `id_producto`;
+ALTER TABLE `inventarios`
+    MODIFY COLUMN `id_bodega` bigint unsigned,
+    MODIFY COLUMN `id_producto` bigint unsigned;
 
-UNLOCK TABLES;
+/* productos */
+CREATE TABLE `productos` (
+    `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+    `nombre` varchar(255) DEFAULT NULL,
+    `descripcion` varchar(255) DEFAULT NULL,
+    `estado` tinyint DEFAULT NULL,
+    `created_by` bigint unsigned DEFAULT NULL,
+    `update_by` bigint unsigned DEFAULT NULL,
+    `created_at` timestamp NULL DEFAULT NULL,
+    `updated_at` timestamp NULL DEFAULT NULL,
+    `deleted_at` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `fk_users_created_by` (`created_by`),
+    KEY `fk_users_updated_by` (`update_by`),
+    CONSTRAINT `fk_users_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+    CONSTRAINT `fk_users_updated_by` FOREIGN KEY (`update_by`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+ALTER TABLE `productos`
+    CHANGE COLUMN `nombres` `nombre` varchar(255);
 
-CREATE TABLE
-    `historiales` (
-        `id` bigint NOT NULL AUTO_INCREMENT,
-        `cantidad` int NOT NULL,
-        `id_bodega_origen` bigint DEFAULT NULL,
-        `id_bodega_destino` bigint DEFAULT NULL,
-        `id_inventario` bigint DEFAULT NULL,
-        `created_by` bigint DEFAULT NULL,
-        `update_by` bigint DEFAULT NULL,
-        `created_at` timestamp NULL DEFAULT NULL,
-        `updated_at` timestamp NULL DEFAULT NULL,
-        `deleted_at` timestamp NULL DEFAULT NULL,
-        PRIMARY KEY (`id`)
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
-
-LOCK TABLES `historiales` WRITE;
-
-UNLOCK TABLES;
-
-CREATE TABLE
-    `inventarios` (
-        `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-        `id_bodega` bigint unsigned NOT NULL,
-        `id_producto` bigint unsigned NOT NULL,
-        `cantidad` int NOT NULL,
-        `created_by` bigint unsigned DEFAULT NULL,
-        `update_by` bigint unsigned DEFAULT NULL,
-        `created_at` timestamp NULL DEFAULT NULL,
-        `updated_at` timestamp NULL DEFAULT NULL,
-        `deleted_at` timestamp NULL DEFAULT NULL,
-        PRIMARY KEY (`id`),
-        UNIQUE KEY `id_bodega` (`id_bodega`),
-        UNIQUE KEY `id_producto` (`id_producto`),
-        KEY `fk_inventarios_created_by` (`created_by`),
-        KEY `fk_inventarios_updated_by` (`update_by`),
-        CONSTRAINT `fk_inventarios_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
-        CONSTRAINT `fk_inventarios_updated_by` FOREIGN KEY (`update_by`) REFERENCES `users` (`id`)
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
-
-ALTER TABLE inventarios DROP INDEX id_bodega, DROP INDEX id_producto;
-
-ALTER TABLE inventarios MODIFY COLUMN id_bodega BIGINT UNSIGNED;
-
-ALTER TABLE inventarios MODIFY COLUMN id_producto BIGINT UNSIGNED;
-
-ALTER TABLE `historiales`
-ADD
-    CONSTRAINT `fk_historiales_id_inventario` FOREIGN KEY (`id_inventario`) REFERENCES `inventarios` (`id`);
-
-LOCK TABLES `inventarios` WRITE;
-
-UNLOCK TABLES;
-
-DROP TABLE IF EXISTS `productos`;
-
-CREATE TABLE
-    `productos` (
-        `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-        `nombres` varchar(255) DEFAULT NULL,
-        `descripcion` varchar(255) DEFAULT NULL,
-        `estado` tinyint DEFAULT NULL,
-        `created_by` bigint unsigned DEFAULT NULL,
-        `update_by` bigint unsigned DEFAULT NULL,
-        `created_at` timestamp NULL DEFAULT NULL,
-        `updated_at` timestamp NULL DEFAULT NULL,
-        `deleted_at` timestamp NULL DEFAULT NULL,
-        PRIMARY KEY (`id`),
-        KEY `fk_users_created_by` (`created_by`),
-        KEY `fk_users_updated_by` (`update_by`),
-        CONSTRAINT `fk_users_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
-        CONSTRAINT `fk_users_updated_by` FOREIGN KEY (`update_by`) REFERENCES `users` (`id`)
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
-
-ALTER TABLE productos CHANGE nombres nombre VARCHAR(255);
-
-ALTER TABLE productos MODIFY COLUMN nombres;
-LOCK TABLES `productos` WRITE;
-
-UNLOCK TABLES;
-
-CREATE TABLE
-    `users` (
+/* users */
+CREATE TABLE `users` (
         `id` bigint unsigned NOT NULL AUTO_INCREMENT,
         `email` varchar(255) DEFAULT NULL,
         `email_verified_at` timestamp NULL DEFAULT NULL,
@@ -129,23 +96,17 @@ CREATE TABLE
         `deleted_at` timestamp NULL DEFAULT NULL,
         PRIMARY KEY (`id`),
         UNIQUE KEY `email` (`email`)
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+ALTER TABLE `users`
+    ADD COLUMN `nombre` varchar(255) NOT NULL;
 
-;
+ALTER TABLE productos DROP FOREIGN KEY fk_users_created_by;
+ALTER TABLE productos DROP FOREIGN KEY fk_users_updated_by;
+ALTER TABLE inventarios DROP FOREIGN KEY fk_inventarios_updated_by;
 
-ALTER TABLE users ADD COLUMN nombre VARCHAR(255) NOT NULL;
-
-ALTER TABLE bodegas
-ADD
-    CONSTRAINT `fk_bodegas_id_responsable` FOREIGN KEY (id_responsable) REFERENCES users (id);
-
-LOCK TABLES `users` WRITE;
-
-UNLOCK TABLES;
 
 /* Insert data */
-INSERT INTO
-    `bodegas` (
+INSERT INTO `bodegas` (
         `id`,
         `nombre`,
         `id_responsable`,
@@ -457,7 +418,6 @@ VALUES (
         '2023-05-25 01:02:57',
         NULL
     );
-
 INSERT INTO `historiales` (
         `id`,
         `cantidad`,
@@ -592,9 +552,7 @@ VALUES (
         '2022-07-21 21:24:15',
         NULL
     );
-
-INSERT INTO
-    `productos` (
+INSERT INTO `productos` (
         `id`,
         `nombre`,
         `descripcion`,
@@ -1076,9 +1034,7 @@ VALUES (
         '2023-05-25 03:52:26',
         NULL
     );
-
-INSERT INTO
-    `users` (
+INSERT INTO `users` (
         `id`,
         `nombre`,
         `email`,
@@ -1223,9 +1179,7 @@ VALUES (
         NULL,
         NULL
     );
-
-INSERT INTO
-    `inventarios` (
+INSERT INTO `inventarios` (
         `id`,
         `id_bodega`,
         `id_producto`,
