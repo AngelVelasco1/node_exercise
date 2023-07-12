@@ -1,6 +1,8 @@
 //? Dependencies
 import dotenv from 'dotenv';
 import express from 'express';
+import 'reflect-metadata';
+
 //? Routes
 import storageBodegas from './routes/bodegas.js';
 import storageProductos from './routes/productos.js';

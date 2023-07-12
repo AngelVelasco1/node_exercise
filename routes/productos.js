@@ -70,4 +70,16 @@ storageProductos.post('/', (req, res) => {
 
 })
 
+//? Transfer productos to other bodega 
+storageProductos.post('/', (req, res) => {
+
+  
+    try {
+        
+    } catch (err) {
+      console.error('Error en la consulta: ', err.message());
+      res.status(500);
+    }
+  });
+  
 export default storageProductos;

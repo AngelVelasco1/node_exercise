@@ -53,6 +53,5 @@ storageInventarios.post('/', (req, res) => {
     }
 
 })
-/* (id_producto, id_bodega, cantidad) VALUES (1, 1, 1)
- */
+
 export default storageInventarios;
